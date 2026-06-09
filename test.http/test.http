@@ -43,3 +43,39 @@ Content-Type: application/json
 ### 5. Tes Ambil Riwayat Booking Saya (Harus Bawa Token Redis)
 GET http://localhost:3000/api/bookings/my
 Authorization: Bearer session_1_1781019760184
+
+### ... (Kodingan tes 1 sampai 5 biarkan saja) ...
+
+### 6. Registrasi Akun Admin Kampus
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "email": "akuadalahadmin@ui.ac.id",
+    "password": "admin290",
+    "role": "admin"
+}
+
+###
+
+### 7. Login Akun Admin (Ambil Token Session Admin)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "akuadalahadmin@ui.ac.id",
+    "password": "admin290"
+}
+
+###
+
+### 8. Akses Mengubah Status Booking (Harus Pakai Token Admin)
+PATCH http://localhost:3000/api/admin/bookings/status
+Authorization: Bearer session_3_1781020083632
+Content-Type: application/json
+
+{
+    "booking_id": 1,
+    "status": "Approved"
+}
