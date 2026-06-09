@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const pool = require('./db');
+const redisClient = require('./redis'); // Memanggil konfigurasi Redis
 const PORT = process.env.PORT || 3000;
 
 // Middleware agar server bisa membaca input JSON dari user
