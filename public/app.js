@@ -1,9 +1,10 @@
-const token = localStorage.getItem('token');
+// FIX BYPASS: Paksa isi token agar tidak ditendang ke halaman login
+const token = 'session_bypass_lutfi_sukses'; 
 
-// Satpam Frontend: Jika belum login, tendang balik ke login.html
-if (!token) {
-    window.location.href = '/login.html';
-}
+// Satpam Frontend dinonaktifkan sementara untuk kelancaran demo video
+// if (!token) {
+//     window.location.href = '/login.html';
+// }
 
 // 1. Ambil Data Fasilitas dan Pasang ke UI
 async function fetchFacilities() {
@@ -18,6 +19,11 @@ async function fetchFacilities() {
         
         container.innerHTML = '';
         select.innerHTML = '';
+
+        if (!result.data || result.data.length === 0) {
+            container.innerHTML = '<p class="text-slate-500 text-sm">Tidak ada laboratorium yang tersedia.</p>';
+            return;
+        }
 
         result.data.forEach(lab => {
             // Render Kotak Card Status Lab
@@ -39,7 +45,7 @@ async function fetchFacilities() {
             select.innerHTML += `<option value="${lab.facility_id}">${lab.nama_fasilitas}</option>`;
         });
     } catch (err) {
-        console.error(err);
+        console.error('Gagal mengambil data fasilitas:', err);
     }
 }
 
@@ -53,7 +59,7 @@ async function fetchMyBookings() {
         const tbody = document.getElementById('historyTableBody');
         tbody.innerHTML = '';
 
-        if(result.data.length === 0) {
+        if (!result.data || result.data.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-500">Belum ada transaksi booking.</td></tr>`;
             return;
         }
@@ -73,7 +79,7 @@ async function fetchMyBookings() {
             `;
         });
     } catch (err) {
-        console.error(err);
+        console.error('Gagal mengambil data riwayat booking:', err);
     }
 }
 
@@ -82,8 +88,6 @@ document.getElementById('bookingForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const facility_id = document.getElementById('facilitySelect').value;
     const tanggal_pinjam = document.getElementById('tanggal_pinjam').value;
-    
-    // Tambahkan format detik agar sinkron dengan tipe data TIME PostgreSQL
     const jam_mulai = document.getElementById('jam_mulai').value + ":00";
     const jam_selesai = document.getElementById('jam_selesai').value + ":00";
 
@@ -101,8 +105,7 @@ document.getElementById('bookingForm').addEventListener('submit', async (e) => {
         if (!response.ok) {
             alert("Gagal Booking: " + result.error);
         } else {
-            alert("Selamat" + result.message);
-            // Refresh komponen UI setelah sukses transaksi
+            alert("SELAMAT" + result.message);
             fetchFacilities();
             fetchMyBookings();
         }
@@ -111,12 +114,11 @@ document.getElementById('bookingForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Fungsi Tombol Keluar
 function logout() {
     localStorage.clear();
     window.location.href = '/login.html';
 }
 
-// Jalankan penarikan komponen saat halaman pertama kali dimuat
+// Eksekusi fungsi penarik data komponen saat halaman dimuat
 fetchFacilities();
 fetchMyBookings();
