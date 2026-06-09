@@ -1,20 +1,23 @@
 const redis = require('redis');
 
-// Membuat client Redis lokal
+// Membuat client Redis (Sintaks simpel khusus versi kompatibel)
 const redisClient = redis.createClient({
-    url: 'redis://localhost:6379'
+    host: '127.0.0.1',
+    port: 6379
 });
 
-redisClient.on('error', (err) => console.error('Gagal koneksi ke Redis Client:', err));
-redisClient.on('connect', () => console.log('Koneksi ke Redis Berhasil dan Aman! ⚡'));
+redisClient.on('error', (err) => {
+    console.error('Redis Error:', err);
+});
 
-// Menghubungkan ke Redis server
-(async () => {
-    try {
-        await redisClient.connect();
-    } catch (err) {
-        console.error('Pastikan aplikasi Redis Stack / Redis Server sudah menyala di laptop lu!');
-    }
-})();
+redisClient.on('connect', () => {
+    console.log('Koneksi ke Redis Berhasil dan Aman');
+});
+
+// Di versi ini, kita pakai perintah .connect() lama jika library mendeteksi v4+, 
+// tapi kalau v3 dia otomatis langsung tersambung via createClient.
+if (typeof redisClient.connect === 'function') {
+    redisClient.connect().catch(() => {});
+}
 
 module.exports = redisClient;

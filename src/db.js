@@ -29,7 +29,7 @@ pool.connect((err, client, release) => {
     if (err) {
         return console.error('Gagal koneksi ke PostgreSQL:', err.stack);
     }
-    console.log('Koneksi ke PostgreSQL Berhasil dan Aman! 🚀');
+    console.log('Koneksi ke PostgreSQL Berhasil dan Aman');
     release();
     initializeDatabase(); // Jalankan pembuatan tabel otomatis
 });
