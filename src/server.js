@@ -4,8 +4,8 @@ const redisClient = require('./redis');
 const { seedFacilities } = require('./seed');
 const { registerUser, loginUser } = require('./auth');
 const { getFacilities } = require('./facility');
-const { requireAuth, requireAdmin } = require('./middleware'); // <-- Import requireAdmin
-const { createBooking, getMyBookings, updateBookingStatus } = require('./booking'); // <-- Import updateBookingStatus
+const { requireAuth, requireAdmin, errorHandler } = require('./middleware'); // <-- Tambah errorHandler
+const { createBooking, getMyBookings, updateBookingStatus } = require('./booking');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,16 +22,36 @@ app.get('/', (req, res) => res.json({ message: "Sistem API FacilRent Kelompok SB
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
 
-// Facilities (Mahasiswa & Admin)
+// Facilities
 app.get('/api/facilities', requireAuth, getFacilities);
 
-// Bookings (Mahasiswa & Admin)
+// Bookings
 app.post('/api/bookings', requireAuth, createBooking);
 app.get('/api/bookings/my', requireAuth, getMyBookings);
 
-// Admin Operations (Diproteksi Ganda: Harus Login & Harus Admin!)
+// Admin Operations
 app.patch('/api/admin/bookings/status', requireAuth, requireAdmin, updateBookingStatus);
 
-// ===============================================================
+// ==================== ERROR HANDLING MIDDLEWARE ====================
+// Wajib ditaruh di paling bawah setelah semua route didefinisikan
+app.use(errorHandler);
 
+// ==================== GRACEFUL SHUTDOWN ====================
+// Otomatis memutuskan koneksi DB dengan rapi pas lu pencet Ctrl + C
+process.on('SIGINT', async () => {
+    console.log('\n Mematikan server FacilRent secara bersih...');
+    try {
+        await pool.end();
+        console.log('Koneksi PostgreSQL berhasil diputus.');
+        redisClient.quit();
+        console.log('Koneksi Redis berhasil diputus.');
+        console.log('Sampai jumpa! Server resmi offline.');
+        process.exit(0);
+    } catch (err) {
+        console.error('Eror pas matiin database:', err);
+        process.exit(1);
+    }
+});
+
+// Jalankan Server
 app.listen(PORT, () => console.log(`Server FacilRent berjalan lancar di http://localhost:${PORT}`));
