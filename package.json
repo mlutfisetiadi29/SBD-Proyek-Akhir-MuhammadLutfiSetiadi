@@ -1,0 +1,29 @@
+{
+  "name": "sbd-proyek-akhir-muhammadlutfisetiadi",
+  "version": "1.0.0",
+  "description": "Proyek Akhir Praktikum SBD",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mlutfisetiadi29/SBD-Proyek-Akhir-MuhammadLutfiSetiadi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mlutfisetiadi29/SBD-Proyek-Akhir-MuhammadLutfiSetiadi/issues"
+  },
+  "homepage": "https://github.com/mlutfisetiadi29/SBD-Proyek-Akhir-MuhammadLutfiSetiadi#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.21.0",
+    "redis": "^6.0.0"
+  }
+}
