@@ -5,7 +5,17 @@ Content-Type: application/json
 {
 "username": "lutfisetiadi",
 "email": "lutfi@ui.ac.id",
-"password": "password123",
+"password": "lutfi290",
+"role": "mahasiswa"
+}
+
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+"username": "ronaldo",
+"email": "ronaldo7@ui.ac.id",
+"password": "goat7",
 "role": "mahasiswa"
 }
 
@@ -17,7 +27,7 @@ Content-Type: application/json
 
 {
 "email": "lutfi@ui.ac.id",
-"password": "password123"
+"password": "lutfi290"
 }
 
 ### 3. Tes Ambil Data Fasilitas
