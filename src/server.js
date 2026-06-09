@@ -4,8 +4,14 @@ const redisClient = require('./redis');
 const { seedFacilities } = require('./seed');
 const { registerUser, loginUser } = require('./auth');
 const { getFacilities } = require('./facility');
-const { requireAuth, requireAdmin, errorHandler } = require('./middleware'); // <-- Tambah errorHandler
-const { createBooking, getMyBookings, updateBookingStatus } = require('./booking');
+const { requireAuth, requireAdmin, errorHandler } = require('./middleware');
+const { 
+    createBooking, 
+    getMyBookings, 
+    updateBookingStatus, 
+    cancelBooking, 
+    getAllBookingsForAdmin 
+} = require('./booking'); // <-- Tambah import fungsi baru
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,28 +24,28 @@ setTimeout(seedFacilities, 2000);
 
 app.get('/', (req, res) => res.json({ message: "Sistem API FacilRent Kelompok SBD Berjalan Sempurna! 🚀" }));
 
-// Auth
+// Auth Route
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
 
-// Facilities
+// Facilities Route
 app.get('/api/facilities', requireAuth, getFacilities);
 
-// Bookings
+// Bookings Route (Mahasiswa)
 app.post('/api/bookings', requireAuth, createBooking);
 app.get('/api/bookings/my', requireAuth, getMyBookings);
+app.delete('/api/bookings/:id', requireAuth, cancelBooking); // <-- Rute pembatalan baru!
 
-// Admin Operations
+// Admin Operations Route
+app.get('/api/admin/bookings', requireAuth, requireAdmin, getAllBookingsForAdmin); // <-- Rute monitoring baru!
 app.patch('/api/admin/bookings/status', requireAuth, requireAdmin, updateBookingStatus);
 
 // ==================== ERROR HANDLING MIDDLEWARE ====================
-// Wajib ditaruh di paling bawah setelah semua route didefinisikan
 app.use(errorHandler);
 
 // ==================== GRACEFUL SHUTDOWN ====================
-// Otomatis memutuskan koneksi DB dengan rapi pas lu pencet Ctrl + C
 process.on('SIGINT', async () => {
-    console.log('\n Mematikan server FacilRent secara bersih...');
+    console.log('\nMematikan server FacilRent secara bersih...');
     try {
         await pool.end();
         console.log('Koneksi PostgreSQL berhasil diputus.');
@@ -53,5 +59,4 @@ process.on('SIGINT', async () => {
     }
 });
 
-// Jalankan Server
 app.listen(PORT, () => console.log(`Server FacilRent berjalan lancar di http://localhost:${PORT}`));

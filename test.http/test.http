@@ -79,3 +79,15 @@ Content-Type: application/json
     "booking_id": 1,
     "status": "Approved"
 }
+
+### ... (Kodingan tes 1 sampai 8 biarkan saja) ...
+
+### 9. Tes Admin: Melihat Seluruh Antrean Booking yang Masuk
+GET http://localhost:3000/api/admin/bookings
+Authorization: Bearer session_3_1781020509733
+
+###
+
+### 10. Tes Mahasiswa: Membatalkan/Menghapus Booking Sendiri (Ganti nomor id di akhir url sesuai booking_id lu)
+DELETE http://localhost:3000/api/bookings/1
+Authorization: Bearer session_1_1781020533775
