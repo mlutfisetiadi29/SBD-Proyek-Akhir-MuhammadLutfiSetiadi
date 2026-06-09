@@ -5,6 +5,7 @@ const { seedFacilities } = require('./seed');
 const { registerUser, loginUser } = require('./auth');
 const { getFacilities } = require('./facility');
 const { requireAuth } = require('./middleware');
+const { createBooking } = require('./booking'); // <-- Import baru
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,8 +26,11 @@ app.get('/', (req, res) => {
 app.post('/api/auth/register', registerUser);
 app.post('/api/auth/login', loginUser);
 
-// 3. Endpoint Fasilitas (Diproteksi - Harus Login & Bawa Token Redis)
+// 3. Endpoint Fasilitas (Diproteksi)
 app.get('/api/facilities', requireAuth, getFacilities);
+
+// 4. Endpoint Transaksi Peminjaman (Diproteksi - Baru)
+app.post('/api/bookings', requireAuth, createBooking);
 
 // ===============================================================
 

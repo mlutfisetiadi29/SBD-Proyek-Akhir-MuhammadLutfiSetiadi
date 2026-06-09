@@ -25,3 +25,16 @@ Content-Type: application/json
 ### 3. Tes Ambil Data Fasilitas (Harus Login Dulu)
 GET http://localhost:3000/api/facilities
 Authorization: Bearer session_1_1781018444407
+
+###
+
+### 4. Tes Pengajuan Booking Fasilitas (Harus Tempel Token Login Lu di Header)
+POST http://localhost:3000/api/bookings
+Authorization: Bearer session_1_1781019048578
+Content-Type: application/json
+
+{
+    "id_fasilitas": 1,
+    "tanggal_peminjaman": "2026-06-15",
+    "durasi_jam": 3
+}
