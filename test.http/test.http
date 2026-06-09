@@ -20,21 +20,26 @@ Content-Type: application/json
 "password": "password123"
 }
 
-###
-
-### 3. Tes Ambil Data Fasilitas (Harus Login Dulu)
+### 3. Tes Ambil Data Fasilitas
 GET http://localhost:3000/api/facilities
-Authorization: Bearer session_1_1781018444407
+Authorization: Bearer session_1_1781019603342
 
 ###
 
-### 4. Tes Pengajuan Booking Fasilitas (Harus Tempel Token Login Lu di Header)
+### 4. Tes Pengajuan Booking Fasilitas (Sesuai Kolom SQL Baru)
 POST http://localhost:3000/api/bookings
-Authorization: Bearer session_1_1781019048578
+Authorization: Bearer session_1_1781019603342
 Content-Type: application/json
 
 {
-    "id_fasilitas": 1,
-    "tanggal_peminjaman": "2026-06-15",
-    "durasi_jam": 3
+    "facility_id": 1,
+    "tanggal_pinjam": "2026-06-15",
+    "jam_mulai": "08:00:00",
+    "jam_selesai": "11:00:00"
 }
+
+### ... (Kodingan tes 1 sampai 4 biarkan saja) ...
+
+### 5. Tes Ambil Riwayat Booking Saya (Harus Bawa Token Redis)
+GET http://localhost:3000/api/bookings/my
+Authorization: Bearer session_1_1781019760184

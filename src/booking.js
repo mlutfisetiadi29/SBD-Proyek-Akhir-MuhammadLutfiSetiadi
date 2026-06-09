@@ -1,39 +1,68 @@
 const pool = require('./db');
 
+// 1. FUNGSI UNTUK MEMBUAT BOOKING BARU
 const createBooking = async (req, res) => {
-    // user_id otomatis didapat dari satpam requireAuth (Redis session)
     const { user_id } = req.user; 
-    const { id_fasilitas, tanggal_peminjaman, durasi_jam } = req.body;
+    const { facility_id, tanggal_pinjam, jam_mulai, jam_selesai } = req.body;
 
     try {
-        // 1. Cek apakah fasilitas yang mau dibooking itu ada dan tersedia
-        const facilityCheck = await pool.query('SELECT * FROM facilities WHERE id_fasilitas = $1', [id_fasilitas]);
+        const facilityCheck = await pool.query('SELECT * FROM facilities WHERE facility_id = $1', [facility_id]);
         
         if (facilityCheck.rows.length === 0) {
-            return res.status(404).json({ error: 'Fasilitas tidak ditemukan!' });
+            return res.status(404).json({ error: 'Fasilitas laboratorium tidak ditemukan!' });
         }
 
         if (!facilityCheck.rows[0].status_ketersediaan) {
-            return res.status(400).json({ error: 'Maaf, fasilitas ini sedang tidak tersedia atau dalam perbaikan.' });
+            return res.status(400).json({ error: 'Maaf, laboratorium ini sedang penuh atau ditutup.' });
         }
 
-        // 2. Masukkan data booking ke tabel bookings/reservations 
-        // (Sesuaikan nama tabel & kolom dengan export.sql lu, di sini asumsi nama tabel 'bookings')
-        const newBooking = await pool.query(
-            'INSERT INTO bookings (user_id, id_fasilitas, tanggal_peminjaman, durasi_jam, status_persetujuan) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [user_id, id_fasilitas, tanggal_peminjaman, durasi_jam, 'pending']
-        );
+        const insertQuery = `
+            INSERT INTO bookings (user_id, facility_id, tanggal_pinjam, jam_mulai, jam_selesai, status_persetujuan) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
+            RETURNING *
+        `;
+        const newBooking = await pool.query(insertQuery, [
+            user_id, 
+            facility_id, 
+            tanggal_pinjam, 
+            jam_mulai, 
+            jam_selesai, 
+            'Pending'
+        ]);
 
         res.status(201).json({
-            message: 'Booking fasilitas berhasil diajukan! Menunggu persetujuan admin. 📝',
+            message: 'Booking fasilitas berhasil diajukan ke lab komputer! 📝',
             bookingData: newBooking.rows[0]
         });
 
     } catch (err) {
-        // Jika nama tabel 'bookings' di export.sql lu ternyata beda (misal: 'peminjaman' atau 'reservations'),
-        // erornya bakal ketangkap di sini buat kita sesuaikan nanti.
         res.status(500).json({ error: err.message });
     }
 };
 
-module.exports = { createBooking };
+// 2. FUNGSI UNTUK MELIHAT RIWAYAT BOOKING USER YANG SEDANG LOGIN (BARU)
+const getMyBookings = async (req, res) => {
+    const { user_id } = req.user; // Diambil otomatis dari token session Redis
+
+    try {
+        // Gabungkan tabel bookings dan facilities menggunakan JOIN agar mahasiswa bisa melihat nama lab-nya
+        const queryText = `
+            SELECT b.booking_id, f.nama_fasilitas, b.tanggal_pinjam, b.jam_mulai, b.jam_selesai, b.status_persetujuan, b.created_at
+            FROM bookings b
+            JOIN facilities f ON b.facility_id = f.facility_id
+            WHERE b.user_id = $1
+            ORDER BY b.created_at DESC
+        `;
+        const result = await pool.query(queryText, [user_id]);
+
+        res.status(200).json({
+            message: 'Riwayat booking lu berhasil diambil!',
+            total_booking: result.rows.length,
+            data: result.rows
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { createBooking, getMyBookings };
