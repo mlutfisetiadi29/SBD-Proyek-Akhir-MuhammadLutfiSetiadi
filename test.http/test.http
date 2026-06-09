@@ -1,0 +1,27 @@
+### 1. Tes Registrasi User Baru
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+"username": "lutfisetiadi",
+"email": "lutfi@ui.ac.id",
+"password": "password123",
+"role": "mahasiswa"
+}
+
+###
+
+### 2. Tes Login User (Simpan Session ke Redis)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+"email": "lutfi@ui.ac.id",
+"password": "password123"
+}
+
+###
+
+### 3. Tes Ambil Data Fasilitas (Harus Login Dulu)
+GET http://localhost:3000/api/facilities
+Authorization: Bearer session_1_1781018444407

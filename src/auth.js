@@ -11,7 +11,7 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ error: 'Email sudah terdaftar!' });
         }
 
-        // Simpan ke PostgreSQL (Dalam rilis produksi, password wajib di-hash pakai bcrypt)
+        // Simpan ke PostgreSQL
         const newUser = await pool.query(
             'INSERT INTO users (username, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING user_id, username, email, role',
             [username, email, password, role || 'mahasiswa']
@@ -36,10 +36,9 @@ const loginUser = async (req, res) => {
         const user = result.rows[0];
         const tokenSession = `session_${user.user_id}_${Date.now()}`;
 
-        // Simpan token session ke REDIS (Batas waktu 1 jam / 3600 detik)
-        await redisClient.set(tokenSession, JSON.stringify({ user_id: user.user_id, role: user.role }), {
-            EX: 3600
-        });
+        // Simpan token session ke REDIS dengan masa berlaku 1 jam (3600 detik)
+        // Menggunakan sintaks setex yang universal untuk Redis v3/v4/v5
+        redisClient.setex(tokenSession, 3600, JSON.stringify({ user_id: user.user_id, role: user.role }));
 
         res.status(200).json({
             message: 'Login sukses! Session disimpan di Redis.',
